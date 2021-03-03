@@ -1,7 +1,7 @@
 package db
 
 import (
-	"github.com/pawarchetan/zendesk-search-engine/internal/tree"
+	"github.com/pawarchetan/zendesk-db/pkg/tree"
 	"sync/atomic"
 	"unsafe"
 )

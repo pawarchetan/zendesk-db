@@ -2,7 +2,7 @@ package db
 
 import (
 	"fmt"
-	"github.com/pawarchetan/zendesk-search-engine/internal/indexer"
+	"github.com/pawarchetan/zendesk-db/pkg/index"
 )
 
 // TableSchema is the schema for a single table.
@@ -10,7 +10,7 @@ import (
 // Indexes: Indexes is the set of indexes for querying this table. The key
 // is a unique name for the index and must match the Name in the IndexSchema.
 type TableSchema struct {
-	Name string
+	Name    string
 	Indexes map[string]*IndexSchema
 }
 
@@ -28,7 +28,7 @@ func (s *TableSchema) Validate() error {
 		return fmt.Errorf("must have id index")
 	}
 
-	if _, ok := s.Indexes["id"].Indexer.(indexer.SingleIndexer); !ok {
+	if _, ok := s.Indexes["id"].Indexer.(index.SingleIndexer); !ok {
 		return fmt.Errorf("id index must be a SingleIndexer")
 	}
 

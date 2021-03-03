@@ -2,8 +2,8 @@ package db
 
 import (
 	"fmt"
-	"github.com/pawarchetan/zendesk-search-engine/internal/indexer"
-	"github.com/pawarchetan/zendesk-search-engine/internal/tree"
+	"github.com/pawarchetan/zendesk-db/pkg/index"
+	"github.com/pawarchetan/zendesk-db/pkg/tree"
 	"sync/atomic"
 	"unsafe"
 )
@@ -26,7 +26,7 @@ type Transaction struct {
 }
 
 func (txn *Transaction) read(table, index string) *tree.Transaction {
-	if	txn.content != nil {
+	if txn.content != nil {
 		key := tableIndex{table, index}
 		exist, ok := txn.content[key]
 		if ok {
@@ -93,7 +93,7 @@ func (txn *Transaction) Insert(table string, obj interface{}) error {
 
 	// Get the primary ID of the object
 	idSchema := tableSchema.Indexes[id]
-	idIndexer := idSchema.Indexer.(indexer.SingleIndexer)
+	idIndexer := idSchema.Indexer.(index.SingleIndexer)
 	ok, idVal, err := idIndexer.FromObject(obj)
 	if err != nil {
 		return fmt.Errorf("failed to build primary index: %v", err)
@@ -111,11 +111,11 @@ func (txn *Transaction) Insert(table string, obj interface{}) error {
 			err    error
 		)
 		switch indexerType := indexSchema.Indexer.(type) {
-		case indexer.SingleIndexer:
+		case index.SingleIndexer:
 			var val []byte
 			ok, val, err = indexerType.FromObject(obj)
 			values = [][]byte{val}
-		case indexer.MultiIndexer:
+		case index.MultiIndexer:
 			ok, values, err = indexerType.FromObject(obj)
 		}
 		if err != nil {
@@ -187,7 +187,7 @@ func (txn *Transaction) Get(table, index string, args ...interface{}) (ResultIte
 	//indexIter.SeekPrefix(val)
 
 	iter := &radixIterator{
-		iter:    indexIter,
+		iter: indexIter,
 	}
 	return iter, nil
 }
@@ -206,7 +206,7 @@ func (txn *Transaction) getIndexIterator(table, index string, args ...interface{
 }
 
 type radixIterator struct {
-	iter    *tree.Iterator
+	iter *tree.Iterator
 }
 
 func (r *radixIterator) Next() interface{} {

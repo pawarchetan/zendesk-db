@@ -2,7 +2,7 @@ package db
 
 import (
 	"fmt"
-	"github.com/pawarchetan/zendesk-search-engine/internal/indexer"
+	"github.com/pawarchetan/zendesk-db/pkg/index"
 )
 
 // IndexSchema is the schema for an index. An index defines how a table is queried.
@@ -10,7 +10,7 @@ import (
 // This must match the key in the map of Indexes for a TableSchema.
 type IndexSchema struct {
 	Name    string
-	Indexer indexer.Indexer
+	Indexer index.Indexer
 }
 
 func (s *IndexSchema) Validate() error {
@@ -21,8 +21,8 @@ func (s *IndexSchema) Validate() error {
 		return fmt.Errorf("missing index function for '%s'", s.Name)
 	}
 	switch s.Indexer.(type) {
-	case indexer.SingleIndexer:
-	case indexer.MultiIndexer:
+	case index.SingleIndexer:
+	case index.MultiIndexer:
 	default:
 		return fmt.Errorf("index for '%s' must be a SingleIndexer or MultiIndexer", s.Name)
 	}

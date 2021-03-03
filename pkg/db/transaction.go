@@ -135,21 +135,6 @@ func (txn *Transaction) Insert(table string, obj interface{}) error {
 	return nil
 }
 
-// First is used to return the first matching object for the given constraints on the index
-func (txn *Transaction) First(table, index string, args ...interface{}) (interface{}, error) {
-	indexSchema, val, err := txn.getIndexValue(table, index, args...)
-	if err != nil {
-		return nil, err
-	}
-
-	indexTxn := txn.read(table, indexSchema.Name)
-
-	iter := indexTxn.Root().Iterator()
-	iter.SeekPrefix(val)
-	_, value, _ := iter.Next()
-	return value, nil
-}
-
 func (txn *Transaction) getIndexValue(table, index string, args ...interface{}) (*IndexSchema, []byte, error) {
 	tableSchema, ok := txn.db.schema.Tables[table]
 	if !ok {
@@ -179,12 +164,12 @@ type ResultIterator interface {
 
 // Get is used to construct a ResultIterator over all the rows that match the given constraints of an index.
 func (txn *Transaction) Get(table, index string, args ...interface{}) (ResultIterator, error) {
-	indexIter, _, err := txn.getIndexIterator(table, index, args...)
+	indexIter, val, err := txn.getIndexIterator(table, index, args...)
 	if err != nil {
 		return nil, err
 	}
 
-	//indexIter.SeekPrefix(val)
+	indexIter.SeekPrefix(val)
 
 	iter := &radixIterator{
 		iter: indexIter,

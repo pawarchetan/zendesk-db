@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	id = "id"
+	id = "_id"
 )
 
 // tableIndex is a tuple of (Table, Index) used for lookups

@@ -24,11 +24,11 @@ func (s *TableSchema) Validate() error {
 		return fmt.Errorf("missing table indexes for '%s'", s.Name)
 	}
 
-	if _, ok := s.Indexes["id"]; !ok {
+	if _, ok := s.Indexes[id]; !ok {
 		return fmt.Errorf("must have id index")
 	}
 
-	if _, ok := s.Indexes["id"].Indexer.(index.SingleIndexer); !ok {
+	if _, ok := s.Indexes[id].Indexer.(index.SingleIndexer); !ok {
 		return fmt.Errorf("id index must be a SingleIndexer")
 	}
 
